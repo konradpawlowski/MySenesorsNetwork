@@ -21,5 +21,8 @@
     <ClInclude Include="__vm\.RF24SerialGetway.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\OneDrive\Documents\Arduino\libraries\DallasTemperature\DallasTemperature.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
