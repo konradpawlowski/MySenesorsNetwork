@@ -1,4 +1,3 @@
-
 /**
 * The MySensors Arduino library handles the wireless radio link and protocol
 * between your home built sensors/actuators and HA controller of choice.
@@ -38,65 +37,62 @@
 */
 
 
+
 #include <DHT.h>
 #include <DallasTemperature.h>
 #include <OneWire.h>
 #include <Adafruit_BMP085.h>
 
 #include <Wire.h>
-#ifdef MY_DEBUG
 
-#define Sprintln(a) (Serial.println(a))
-#define Sprint(a) (Serial.println(a))
-#else
-#define Sprintln(a)
-#define Sprint(a) 
-#endif
+
 // Enable debug prints to serial monitor
 #define MY_DEBUG
 
-//
-//// Enable and select radio type attached
-//#define MY_RADIO_NRF24
-//
-//// Set LOW transmit power level as default, if you have an amplified NRF-module and
-//// power your radio separately with a good regulator you can turn up PA level.
-//#define MY_RF24_PA_LEVEL RF24_PA_LOW
-//
+
+
+
+// Enable and select radio type attached
+#define MY_RADIO_NRF24
+
+// Set LOW transmit power level as default, if you have an amplified NRF-module and
+// power your radio separately with a good regulator you can turn up PA level.
+#define MY_RF24_PA_LEVEL RF24_PA_HIGH
+
+
+
+// Define a lower baud rate for Arduino's running on 8 MHz (Arduino Pro Mini 3.3V & SenseBender)
+#if F_CPU == 8000000L
+#define MY_BAUD_RATE 38400
+#endif
+
+
 
 //
-//// Define a lower baud rate for Arduino's running on 8 MHz (Arduino Pro Mini 3.3V & SenseBender)
-//#if F_CPU == 8000000L
-//#define MY_BAUD_RATE 38400
-//#endif
-
-
-
-
-// Enable RS485 transport layer
-#define MY_RS485
-
-// Define this to enables DE-pin management on defined pin
-#define MY_RS485_DE_PIN 9
-
-// Set RS485 baud rate to use
-#define MY_RS485_BAUD_RATE 9600
-
+//// Enable RS485 transport layer
+//#define MY_RS485
+//
+//// Define this to enables DE-pin management on defined pin
+//#define MY_RS485_DE_PIN 9
+//
+//// Set RS485 baud rate to use
+//#define MY_RS485_BAUD_RATE 9600
+//
 
 //// Enable serial gateway
 #define MY_GATEWAY_SERIAL
 // Enable inclusion mode
 #define MY_INCLUSION_MODE_FEATURE
 // Enable Inclusion mode button on gateway
-//#define MY_INCLUSION_BUTTON_FEATURE
+#define MY_INCLUSION_BUTTON_FEATURE
 
 // Inverses behavior of inclusion button (if using external pullup)
-//#define MY_INCLUSION_BUTTON_EXTERNAL_PULLUP
+#define MY_INCLUSION_BUTTON_EXTERNAL_PULLUP
 
 // Set inclusion mode duration (in seconds)
 #define MY_INCLUSION_MODE_DURATION 60
 // Digital pin used for inclusion mode button
-//#define MY_INCLUSION_MODE_BUTTON_PIN  3
+#define MY_INCLUSION_MODE_BUTTON_PIN  3
 
 // Set blinking period
 #define MY_DEFAULT_LED_BLINK_PERIOD 300
@@ -112,19 +108,20 @@
 
 
 
-#define MY_NODE_ID 1
+#define MY_NODE_ID 10
+//#define MY_PARENT_ID 1
 
 #define DHT_DATA_PIN 7
 #define ONE_WIRE_BUS 8 // Pin where dallase sensor is connected 
 #define TEMPERATURE_PRECISION 10
 
-
+#include <MyConfig.h>
 #include <MySensors.h>
 OneWire oneWire(ONE_WIRE_BUS); // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 DallasTemperature sensors(&oneWire); // Pass the oneWire reference to Dallas Temperature. 
 
 // Set this offset if the sensor has a permanent small offset to the real temperatures
-#define SENSOR_TEMP_OFFSET 0.25
+
 
 static const uint64_t UPDATE_INTERVAL = 60000;
 static const uint8_t FORCE_UPDATE_N_READS = 10;
@@ -136,8 +133,7 @@ bool metric = true;
 DHT dht;
 Adafruit_BMP085 bmp;
 
-int DsId[7] = { 0,1,2,3,4,5,6 };
-char SensorName[] = { 'Woda', 'Piec', 'Spaliny', 'Zewnetrzny', 'Wilgotnosc', 'Zewnetrzny2', 'Cisnienie' };
+//int DsId[7] = { 0,1,2,3,4,5,6 };
 mysensor_sensor SensorType[] = { S_TEMP, S_TEMP, S_TEMP, S_TEMP, S_HUM, S_TEMP, S_BARO };
 MyMessage SensorMsg[7] = {
 		MyMessage(0, V_TEMP),
@@ -157,8 +153,9 @@ DeviceAddress SensorAddress[3] = {
 	};
 float SensorValue[7] = { 0,0,0,0,0,0,0 };
 float SensorLastValue[7] = { 0,0,0,0,0,0,0 };
-
-
+float SensorOffset[7] = { 0.25, 0.25, 0.25, 0.25, 0.5, 0.25, 0.01 };
+unsigned long SensorSendInterval[7] = { 10000, 10000, 10000, 60000, 60000, 60000, 60000 };
+unsigned long SensorISendStop[7] = { 0, 0, 0, 0, 0, 0, 0 };
 
 unsigned long iDhtStop = 0;
 unsigned long iDsStop = 0;
@@ -170,8 +167,8 @@ unsigned long iBmpStop = 0;
 void setup()
 {
 	SetupDs182b();
-//	SetupDht();
-//	SetupBmp180();
+	SetupDht();
+	SetupBmp180();
 
 }
 
@@ -182,17 +179,17 @@ void presentation()
 	// Register all sensors to gw (they will be created as child devices)
 	for (int i = 0; i < 7; i++)
 	{
-		present(i, SensorType[i], SensorName[i]);
+		present(i, SensorType[i]);
 	}
 	metric = getControllerConfig().isMetric;
 }
 
 void loop()
 {
-	//ReadBmp(1000);
-	//ReadDht(1000);
+	ReadBmp(1000);
+	ReadDht(1000);
 	ReadDs(1000);
-	Send(1000);
+	Send(5000);
 }
 
 void ReadBmp(unsigned long interval) {
@@ -207,14 +204,16 @@ void ReadBmp(unsigned long interval) {
 		if (isnan(temperature)) {
 			Serial.println("Failed reading temperature from BMP180!");
 		}
-		else if (temperature != SensorValue[5]) {
+		else {
 			// Only send temperature if it changed since the last measurement or if we didn't send an update for n times
 			SensorValue[5] = temperature;
 		}
 
 
-		Sprint("T: ");
-		Sprint(temperature);
+#ifdef MY_DEBUG
+		Serial.print("T: ");
+		Serial.println(temperature);
+#endif
 
 
 		// Get humidity from DHT library
@@ -222,13 +221,16 @@ void ReadBmp(unsigned long interval) {
 		if (isnan(pressure)) {
 			Serial.println("Failed reading humidity from DHT");
 		}
-		else if (pressure != SensorValue[6]) {
+		else {
 			// Only send humidity if it changed since the last measurement or if we didn't send an update for n times
-			SensorValue[6] = pressure;
+			SensorValue[6] = pressure / 100; // wynik w hPa
 
 
-			Sprint("H: ");
-			Sprintln(pressure);
+#ifdef MY_DEBUG
+			Serial.print("P: ");
+			Serial.print(SensorValue[6]);
+			Serial.println(" hPa");
+#endif
 
 		}
 		iBmpStop = millis();
@@ -238,6 +240,8 @@ void ReadBmp(unsigned long interval) {
 void ReadDht(unsigned long interval) {
 	if (millis() - iDhtStop >= interval)
 	{
+		
+
 		// Send locally attached sensor data here
 		// Force reading sensor, so it works also after sleep()
 		dht.readSensor();
@@ -247,14 +251,16 @@ void ReadDht(unsigned long interval) {
 		if (isnan(temperature)) {
 			Serial.println("Failed reading temperature from DHT!");
 		}
-		else if (temperature != SensorValue[3]) {
+		else {
 			// Only send temperature if it changed since the last measurement or if we didn't send an update for n times
 			SensorValue[3] = temperature;
 		}
 
 
-		Sprint("T: ");
-		Sprintln(temperature);
+#ifdef MY_DEBUG
+		Serial.print("T: ");
+		Serial.println(temperature);
+#endif
 
 		
 			// Get humidity from DHT library
@@ -262,13 +268,15 @@ void ReadDht(unsigned long interval) {
 			if (isnan(humidity)) {
 				Serial.println("Failed reading humidity from DHT");
 			}
-			else if (humidity != SensorValue[4] ) {
+			else {
 				// Only send humidity if it changed since the last measurement or if we didn't send an update for n times
 				SensorValue[4] = humidity;
 				
-
-				Sprint("H: ");
-				Sprintln(humidity);
+#ifdef MY_DEBUG
+				Serial.print("H: ");
+				Serial.print(humidity);
+				Serial.println(" %");
+#endif
 
 			}
 			iDhtStop = millis();
@@ -293,10 +301,10 @@ void ReadDs(unsigned long interval)
 			// Fetch and round temperature to one decimal
 			//float temperature = static_cast<float>(static_cast<int>((getControllerConfig().isMetric ? sensors.getTempC(SensorAddress[i]) : sensors.getTempF(SensorAddress[i])) * 10.)) / 10.;
 			float temperature = sensors.getTempC(SensorAddress[i]);
-			printData(sensors, SensorAddress[i]);
+			//printData(sensors, SensorAddress[i]);
 			// Only send data if temperature has changed and no error
 
-			if (SensorValue[i] != temperature && temperature != -127.00 && temperature != 85.00) {
+			if (temperature != -127.00 && temperature != 85.00) {
 				SensorValue[i] = temperature;
 			}
 		}
@@ -304,14 +312,18 @@ void ReadDs(unsigned long interval)
 
 	}
 }
-void Send(unsigned long interval) 
+void Send(unsigned long interval)
 	{
-		if (millis() - iSendStop >= interval)
+	if (millis() - iSendStop >= interval)
+	{
+		//send(SensorMsg[6].setSensor(6).set(SensorValue[6], 2));
+		for (int i = 0; i < 7; i++)
 		{
-			for (int i = 0; i < 7; i++)
+			//if (millis() - SensorISendStop[i] >= SensorSendInterval[i])
 			{
+				//send(SensorMsg[i].setSensor(i).set(SensorValue[i], 2));
 				if ((SensorLastValue[i] != SensorValue[i] &&
-					abs(SensorLastValue[i] - SensorValue[i]) > SENSOR_TEMP_OFFSET
+					abs(SensorLastValue[i] - SensorValue[i]) > SensorOffset[i]
 					) || nNoUpdates[i] == FORCE_UPDATE_N_READS)
 				{
 					send(SensorMsg[i].setSensor(i).set(SensorValue[i], 2));
@@ -322,33 +334,33 @@ void Send(unsigned long interval)
 				{
 					nNoUpdates[i]++;
 				}
+				//SensorISendStop[i] = millis();
 			}
-			iSendStop = millis();
 		}
+		iSendStop = millis();
+	}
+		
 	}
 void SetupBmp180() {
 	if (!bmp.begin())
 	{
-		Sprintln("Nie odnaleziono czujnika BMP085 / BMP180");
-		//while (1) {}
+#ifdef MY_DEBUG
+		Serial.print("Nie odnaleziono czujnika BMP085 / BMP180");
+#endif
 	}
 }
 void SetupDs182b() {
 	sensors.begin();						  // locate devices on the bus
 	SensorsCount = sensors.getDeviceCount();
 
-	Sprint("Locating devices pin8 ...");
-	Sprint("Found ");
-	Sprint(String(sensors.getDeviceCount(), DEC));
-	Sprintln(" devices.");
 
 	//ustawienia rozdzielczosci
 	for (uint8_t i = 0; i < SensorsCount; i++)
 	{
 		DeviceAddress  add;
-		if (!sensors.getAddress(add, i)) Sprintln("Unable to find address for Device ");
+		if (!sensors.getAddress(add, i)) Serial.print("Unable to find address for Device ");
 		sensors.setResolution(add, TEMPERATURE_PRECISION);
-		printResolution(sensors, add);
+		//printResolution(sensors, add);
 	}
 
 }
@@ -361,35 +373,4 @@ void SetupDht() {
 	// Sleep for the time of the minimum sampling period to give the sensor time to power up
 	// (otherwise, timeout errors might occure for the first reading)
 	sleep(dht.getMinimumSamplingPeriod());
-}
-void printData(DallasTemperature sens, DeviceAddress deviceAddress)
-{
-	Sprint("Device Address: ");
-	printAddress(deviceAddress);
-	Sprint(" ");
-	printTemperature(sens, deviceAddress);
-	Sprintln();
-}
-void printTemperature(DallasTemperature sens, DeviceAddress deviceAddress)
-{
-	float tempC = sens.getTempC(deviceAddress);
-	Sprint("Temp C: ");
-	Sprint(tempC);
-	Sprint(" Temp F: ");
-	Sprint(DallasTemperature::toFahrenheit(tempC));
-}
-void printResolution(DallasTemperature sens, DeviceAddress deviceAddress)
-{
-	Sprint("Resolution: ");
-	Sprint(sens.getResolution(deviceAddress));
-	Sprintln();
-}
-void printAddress(DeviceAddress deviceAddress)
-{
-	for (uint8_t i = 0; i < 8; i++)
-	{
-		// zero pad the address if necessary
-		if (deviceAddress[i] < 16) Sprint("0");
-		Sprint(String(deviceAddress[i], HEX));
-	}
 }
