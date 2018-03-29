@@ -7,6 +7,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RF24SerialGetway", "RF24Ser
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RS485SerialGetway", "RS485SerialGetway\RS485SerialGetway.vcxproj", "{AD6496C6-57F8-4BAC-A833-A6254A071D81}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sensory", "Sensory", "{3410BD24-F4D6-403F-8296-C700DBB9DFAA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MCP23017_rs485", "MCP23017_rs485\MCP23017_rs485.vcxproj", "{B4E1707D-3E52-4D9A-A729-6310C28B78EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -21,9 +25,16 @@ Global
 		{AD6496C6-57F8-4BAC-A833-A6254A071D81}.Debug|x86.Build.0 = Debug|Win32
 		{AD6496C6-57F8-4BAC-A833-A6254A071D81}.Release|x86.ActiveCfg = Release|Win32
 		{AD6496C6-57F8-4BAC-A833-A6254A071D81}.Release|x86.Build.0 = Release|Win32
+		{B4E1707D-3E52-4D9A-A729-6310C28B78EA}.Debug|x86.ActiveCfg = Debug|Win32
+		{B4E1707D-3E52-4D9A-A729-6310C28B78EA}.Debug|x86.Build.0 = Debug|Win32
+		{B4E1707D-3E52-4D9A-A729-6310C28B78EA}.Release|x86.ActiveCfg = Release|Win32
+		{B4E1707D-3E52-4D9A-A729-6310C28B78EA}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B4E1707D-3E52-4D9A-A729-6310C28B78EA} = {3410BD24-F4D6-403F-8296-C700DBB9DFAA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8629710F-0A6C-4DC6-A3EF-1922C1B5F601}

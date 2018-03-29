@@ -1,0 +1,5 @@
+{
+    "sketch": "MCP23017_rs485.ino",
+    "board": "arduino:avr:nano",
+    "configuration": "cpu=atmega328"
+}

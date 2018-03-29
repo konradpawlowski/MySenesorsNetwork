@@ -77,6 +77,7 @@
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="..\RF24SerialGetway\mcp23017_rs485.ino" />
     <None Include="RS485SerialGetway.ino">
       <FileType>CppCode</FileType>
     </None>

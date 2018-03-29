@@ -15,11 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="RS485SerialGetway.ino" />
-    <None Include="..\RF24SerialGetway\mcp23017_rs485.ino" />
+    <None Include="MCP23017_rs485.ino" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="__vm\.RS485SerialGetway.vsarduino.h">
+    <ClInclude Include="__vm\.MCP23017_rs485.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Arduino\libraries\Adafruit_MCP23017_Arduino_Library\Adafruit_MCP23017.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
