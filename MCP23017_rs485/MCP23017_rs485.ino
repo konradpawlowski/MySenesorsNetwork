@@ -153,25 +153,35 @@ void setup()
 void presentation()
 {
 	// Present locally attached sensors
-	sendSketchInfo("MCP23017", "1.0");
+	sendSketchInfo("MCP23017", "1.1");
 	for (int i = 0; i < 16; i++)
 	{
 		if (i == 0) {
 			present(i, S_DOOR);
+			wait(50);
+			send(msg[i].set(loadState(i) == true ? RELAY_ON : RELAY_OFF));
 		}
 		else if (i < 7)
 		{
 			present(i, S_MOTION);
+			wait(50);
+			send(msg[i].set(loadState(i) == true ? RELAY_ON : RELAY_OFF));
 		}
 		else if (i == 7)
 		{
 			present(i, S_LIGHT);
+			wait(50);
+			send(msg[i].set(loadState(i) == true ? RELAY_ON : RELAY_OFF));
+			
 		}
 		else
 		{
-		
 			present(i, S_BINARY);
+			wait(50);
+			send(msg[i].set(loadState(i) == true ? RELAY_ON : RELAY_OFF));
+		
 		}
+		wait(50);
 	}
 }
 
@@ -184,6 +194,7 @@ void loop()
 		if (lastValue[i] != value)
 		{
 			send(msg[i].set(value == true ? RELAY_ON : RELAY_OFF));
+			wait(100);
 			lastValue[i] = value;
 		}
 	}
@@ -200,10 +211,12 @@ void receive(const MyMessage &message)
 		mcp.digitalWrite(message.sensor , message.getBool() ? RELAY_ON : RELAY_OFF);
 		// Store state in eeprom
 		saveState(message.sensor, message.getBool());
+		send(msg[message.sensor].set(message.getBool() == true ? RELAY_ON : RELAY_OFF));
 		// Write some debug info
 		Serial.print("Incoming change for sensor:");
 		Serial.print(message.sensor);
 		Serial.print(", New status: ");
 		Serial.println(message.getBool());
+		wait(100);
 	}
 }	
