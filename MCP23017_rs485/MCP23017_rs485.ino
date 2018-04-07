@@ -172,14 +172,14 @@ void presentation()
 			present(i, S_LIGHT);
 			wait(50);
 			send(msg[i].set(loadState(i) == true ? RELAY_ON : RELAY_OFF));
-			
+
 		}
 		else
 		{
 			present(i, S_BINARY);
 			wait(50);
 			send(msg[i].set(loadState(i) == true ? RELAY_ON : RELAY_OFF));
-		
+
 		}
 		wait(50);
 	}
@@ -198,25 +198,48 @@ void loop()
 			lastValue[i] = value;
 		}
 	}
-	
 
-	
+
+
 }
 
 void receive(const MyMessage &message)
 {
+
 	// We only expect one type of message from controller. But we better check anyway.
-	if (message.type == V_STATUS ) {
-		// Change relay state
-		mcp.digitalWrite(message.sensor , message.getBool() ? RELAY_ON : RELAY_OFF);
-		// Store state in eeprom
-		saveState(message.sensor, message.getBool());
-		send(msg[message.sensor].set(message.getBool() == true ? RELAY_ON : RELAY_OFF));
-		// Write some debug info
-		Serial.print("Incoming change for sensor:");
-		Serial.print(message.sensor);
-		Serial.print(", New status: ");
-		Serial.println(message.getBool());
-		wait(100);
+	if (message.type == V_STATUS) {
+
+		if (message.sensor == 8)
+		{
+			if (message.getBool()) {
+				mcp.digitalWrite(message.sensor, RELAY_ON);
+				wait(500);
+				mcp.digitalWrite(message.sensor, RELAY_OFF);
+				wait(200);
+				saveState(message.sensor, RELAY_OFF);
+				send(msg[message.sensor].set(RELAY_OFF));
+			}
+			else {
+				mcp.digitalWrite(message.sensor, RELAY_OFF);
+				wait(200);
+				saveState(message.sensor, RELAY_OFF);
+				send(msg[message.sensor].set(RELAY_OFF));
+			}
+		}
+		else {
+
+
+			// Change relay state
+			mcp.digitalWrite(message.sensor, message.getBool() ? RELAY_ON : RELAY_OFF);
+			// Store state in eeprom
+			saveState(message.sensor, message.getBool());
+			send(msg[message.sensor].set(message.getBool() ? RELAY_ON : RELAY_OFF));
+			// Write some debug info
+			Serial.print("Incoming change for sensor:");
+			Serial.print(message.sensor);
+			Serial.print(", New status: ");
+			Serial.println(message.getBool());
+			wait(100);
+		}
 	}
-}	
+}
