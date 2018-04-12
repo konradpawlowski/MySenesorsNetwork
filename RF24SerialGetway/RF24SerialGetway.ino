@@ -47,7 +47,7 @@
 
 
 // Enable debug prints to serial monitor
-#define MY_DEBUG
+//#define MY_DEBUG
 
 
 
@@ -134,15 +134,23 @@ DHT dht;
 Adafruit_BMP085 bmp;
 
 //int DsId[7] = { 0,1,2,3,4,5,6 };
-mysensor_sensor SensorType[] = { S_TEMP, S_TEMP, S_TEMP, S_TEMP, S_HUM, S_TEMP, S_BARO };
+//mysensor_sensor SensorType[] = { S_TEMP, S_TEMP, S_TEMP, S_TEMP, S_HUM, S_TEMP, S_BARO };
+//MyMessage SensorMsg[7] = {
+//		MyMessage(0, V_TEMP),
+//		MyMessage(1, V_TEMP),
+//		MyMessage(2, V_TEMP),
+//		MyMessage(3, V_TEMP),
+//		MyMessage(4, V_HUM),
+//		MyMessage(5, V_TEMP),
+//		MyMessage(6, V_PRESSURE)
+//};
+mysensor_sensor SensorType[] = { S_TEMP, S_TEMP, S_TEMP,  S_TEMP, S_BARO };
 MyMessage SensorMsg[7] = {
 		MyMessage(0, V_TEMP),
 		MyMessage(1, V_TEMP),
 		MyMessage(2, V_TEMP),
 		MyMessage(3, V_TEMP),
-		MyMessage(4, V_HUM),
-		MyMessage(5, V_TEMP),
-		MyMessage(6, V_PRESSURE)
+		MyMessage(4, V_PRESSURE)
 };
 
 int SensorsCount;
@@ -151,11 +159,11 @@ DeviceAddress SensorAddress[3] = {
 	{0x28, 0x7C, 0x35, 0x28, 0x00, 0x00, 0x80, 0x4D},
 	{0x28, 0x0B, 0x23, 0x28, 0x00, 0x00, 0x80, 0xB0}
 	};
-float SensorValue[7] = { 0,0,0,0,0,0,0 };
-float SensorLastValue[7] = { 0,0,0,0,0,0,0 };
-float SensorOffset[7] = { 0.25, 0.25, 0.25, 0.25, 0.5, 0.25, 0.01 };
-unsigned long SensorSendInterval[7] = { 10000, 10000, 10000, 60000, 60000, 60000, 60000 };
-unsigned long SensorISendStop[7] = { 0, 0, 0, 0, 0, 0, 0 };
+float SensorValue[5] = { 0,0,0,0,0};
+float SensorLastValue[5] = { 0,0,0,0,0 };
+float SensorOffset[5] = { 0.5, 0.5, 0.5, 0.5, 1 };
+unsigned long SensorSendInterval[5] = { 60000, 60000, 60000, 300000, 300000 };
+unsigned long SensorISendStop[5] = { 0, 0, 0, 0, 0 };
 
 unsigned long iDhtStop = 0;
 unsigned long iDsStop = 0;
@@ -167,7 +175,7 @@ unsigned long iBmpStop = 0;
 void setup()
 {
 	SetupDs182b();
-	SetupDht();
+	//SetupDht();
 	SetupBmp180();
 
 }
@@ -177,7 +185,7 @@ void presentation()
 	sendSketchInfo("Kotlownia", "1.1");
 
 	// Register all sensors to gw (they will be created as child devices)
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		present(i, SensorType[i]);
 	}
@@ -187,7 +195,7 @@ void presentation()
 void loop()
 {
 	ReadBmp(1000);
-	ReadDht(1000);
+//	ReadDht(1000);
 	ReadDs(1000);
 	Send(5000);
 }
@@ -206,7 +214,7 @@ void ReadBmp(unsigned long interval) {
 		}
 		else {
 			// Only send temperature if it changed since the last measurement or if we didn't send an update for n times
-			SensorValue[5] = temperature;
+			SensorValue[3] = temperature;
 		}
 
 
@@ -223,12 +231,12 @@ void ReadBmp(unsigned long interval) {
 		}
 		else {
 			// Only send humidity if it changed since the last measurement or if we didn't send an update for n times
-			SensorValue[6] = pressure / 100; // wynik w hPa
+			SensorValue[4] = pressure / 100; // wynik w hPa
 
 
 #ifdef MY_DEBUG
 			Serial.print("P: ");
-			Serial.print(SensorValue[6]);
+			Serial.print(SensorValue[4]);
 			Serial.println(" hPa");
 #endif
 
@@ -317,7 +325,7 @@ void Send(unsigned long interval)
 	if (millis() - iSendStop >= interval)
 	{
 		//send(SensorMsg[6].setSensor(6).set(SensorValue[6], 2));
-		for (int i = 0; i < 7; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			//if (millis() - SensorISendStop[i] >= SensorSendInterval[i])
 			{
@@ -326,7 +334,10 @@ void Send(unsigned long interval)
 					abs(SensorLastValue[i] - SensorValue[i]) > SensorOffset[i]
 					) || nNoUpdates[i] == FORCE_UPDATE_N_READS)
 				{
-					send(SensorMsg[i].setSensor(i).set(SensorValue[i], 2));
+					if(i < 4)
+						send(SensorMsg[i].set(SensorValue[i], 2));
+					else
+						send(SensorMsg[i].set(SensorValue[i], 0));
 					SensorLastValue[i] = SensorValue[i];
 					nNoUpdates[i] = 0;
 				}
@@ -334,7 +345,7 @@ void Send(unsigned long interval)
 				{
 					nNoUpdates[i]++;
 				}
-				//SensorISendStop[i] = millis();
+				SensorISendStop[i] = millis();
 			}
 		}
 		iSendStop = millis();
