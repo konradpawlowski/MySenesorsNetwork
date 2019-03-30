@@ -15,6 +15,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OutsideSensors", "OutsideSe
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RoomController1", "RoomController1\RoomController1.vcxproj", "{1B5D1B97-FBB2-4DF4-91B8-4A4E37FD0FCD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemoteSwitch", "..\..\Arduino\RemoteSwitch\RemoteSwitch.vcxproj", "{49084B9A-5876-4FC9-A94B-C40DD57862B7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LedRGBWController", "..\..\Arduino\LedRGBWController\LedRGBWController.vcxproj", "{54129BC1-DAD4-4374-9968-B9976C1B0E19}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WhrilessSwitch", "..\..\Arduino\WhrilessSwitch\WhrilessSwitch.vcxproj", "{AFD6CC79-B7D5-4BDA-B7E8-6B14C2E0A572}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemoteRelay", "..\..\..\..\..\Source\Arduino\RemoteRelay\RemoteRelay.vcxproj", "{BF5D3E8D-9100-4DE3-8E2D-E3CB06B3DC6E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemoteRelayBatterySwitch", "..\..\..\..\..\Source\Arduino\RemoteRelayBatterySwitch\RemoteRelayBatterySwitch.vcxproj", "{C62D4409-D5AE-47DE-B058-07096268B263}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -41,6 +51,26 @@ Global
 		{1B5D1B97-FBB2-4DF4-91B8-4A4E37FD0FCD}.Debug|x86.Build.0 = Debug|Win32
 		{1B5D1B97-FBB2-4DF4-91B8-4A4E37FD0FCD}.Release|x86.ActiveCfg = Release|Win32
 		{1B5D1B97-FBB2-4DF4-91B8-4A4E37FD0FCD}.Release|x86.Build.0 = Release|Win32
+		{49084B9A-5876-4FC9-A94B-C40DD57862B7}.Debug|x86.ActiveCfg = Debug|Win32
+		{49084B9A-5876-4FC9-A94B-C40DD57862B7}.Debug|x86.Build.0 = Debug|Win32
+		{49084B9A-5876-4FC9-A94B-C40DD57862B7}.Release|x86.ActiveCfg = Release|Win32
+		{49084B9A-5876-4FC9-A94B-C40DD57862B7}.Release|x86.Build.0 = Release|Win32
+		{54129BC1-DAD4-4374-9968-B9976C1B0E19}.Debug|x86.ActiveCfg = Debug|Win32
+		{54129BC1-DAD4-4374-9968-B9976C1B0E19}.Debug|x86.Build.0 = Debug|Win32
+		{54129BC1-DAD4-4374-9968-B9976C1B0E19}.Release|x86.ActiveCfg = Release|Win32
+		{54129BC1-DAD4-4374-9968-B9976C1B0E19}.Release|x86.Build.0 = Release|Win32
+		{AFD6CC79-B7D5-4BDA-B7E8-6B14C2E0A572}.Debug|x86.ActiveCfg = Debug|Win32
+		{AFD6CC79-B7D5-4BDA-B7E8-6B14C2E0A572}.Debug|x86.Build.0 = Debug|Win32
+		{AFD6CC79-B7D5-4BDA-B7E8-6B14C2E0A572}.Release|x86.ActiveCfg = Release|Win32
+		{AFD6CC79-B7D5-4BDA-B7E8-6B14C2E0A572}.Release|x86.Build.0 = Release|Win32
+		{BF5D3E8D-9100-4DE3-8E2D-E3CB06B3DC6E}.Debug|x86.ActiveCfg = Debug|Win32
+		{BF5D3E8D-9100-4DE3-8E2D-E3CB06B3DC6E}.Debug|x86.Build.0 = Debug|Win32
+		{BF5D3E8D-9100-4DE3-8E2D-E3CB06B3DC6E}.Release|x86.ActiveCfg = Release|Win32
+		{BF5D3E8D-9100-4DE3-8E2D-E3CB06B3DC6E}.Release|x86.Build.0 = Release|Win32
+		{C62D4409-D5AE-47DE-B058-07096268B263}.Debug|x86.ActiveCfg = Debug|Win32
+		{C62D4409-D5AE-47DE-B058-07096268B263}.Debug|x86.Build.0 = Debug|Win32
+		{C62D4409-D5AE-47DE-B058-07096268B263}.Release|x86.ActiveCfg = Release|Win32
+		{C62D4409-D5AE-47DE-B058-07096268B263}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

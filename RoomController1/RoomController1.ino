@@ -36,9 +36,10 @@
 
 // Enable and select radio type attached
 #define MY_RS485
-#define MY_RS485_DE_PIN 7
+#define MY_RS485_DE_PIN 2
 //#define MY_RADIO_RFM69
-
+#define MY_INCLUSION_MODE_FEATURE
+#define MY_RS485_BAUD_RATE 9600
 // Enabled repeater feature for this node
 //#define MY_REPEATER_FEATURE
 
@@ -49,7 +50,7 @@
 #define ONE_WIRE_BUS 12 // Pin where dallase sensor is connected 
 
 int RELAY_PIN[3] = { 5, 6, 11 }; // Arduino Digital I/O pin number for relay 
-int BUTTON_PIN[3] = { 2, 3, 4 };  // Arduino Digital I/O pin number for button 
+int BUTTON_PIN[3] = { 7, 3, 4 };  // Arduino Digital I/O pin number for button 
 
 #define RELAY_ON 1
 #define RELAY_OFF 0
@@ -84,11 +85,11 @@ MyMessage msg[4] = {
   MyMessage(2,V_LIGHT),
   MyMessage(3,V_TEMP)
 };
-void before()
-{
-	SetupDs182b();
-
-}
+//void before()
+//{
+//	SetupDs182b();
+//
+//}
 void setup()
 {
 	for (size_t i = 0; i < 3; i++)
@@ -127,7 +128,8 @@ void presentation() {
 	{
 		present(i, S_LIGHT);
 	}
-	present(4, S_TEMP);
+	present(3, S_TEMP);
+	
 }
 
 /*
@@ -201,7 +203,8 @@ void receive(const MyMessage &message) {
 void SetupDs182b() {
 	sensors.begin();						  // locate devices on the bus
 	numSensors = sensors.getDeviceCount();
-
+	//Serial.print("Temp sensor: ");
+	//Serial.println(numSensors);
 
 	//ustawienia rozdzielczosci
 	for (uint8_t i = 0; i < numSensors; i++)
@@ -216,7 +219,7 @@ void SetupDs182b() {
 }
 void ReadDs(unsigned long interval)
 {
-	if (millis() - iDsStop >= interval)
+	if (millis() - iDsStop >= interval && numSensors > 0)
 	{
 		// Fetch temperatures from Dallas sensors
 		sensors.requestTemperatures();
@@ -231,7 +234,8 @@ void ReadDs(unsigned long interval)
 
 			// Fetch and round temperature to one decimal
 			float temperature = static_cast<float>(static_cast<int>((getControllerConfig().isMetric ? sensors.getTempCByIndex(i) : sensors.getTempFByIndex(i)) * 10.)) / 10.;
-
+			Serial.print("Temperature: ");
+			Serial.println(temperature);
 			// Only send data if temperature has changed and no error
 #if COMPARE_TEMP == 1
 			if (lastTemperature[i] != temperature && temperature != -127.00 && temperature != 85.00) {
@@ -244,6 +248,7 @@ void ReadDs(unsigned long interval)
 				// Save new temperatures for next compare
 				lastTemperature[i] = temperature;
 			}
+
 		}
 		iDsStop = millis();
 	}
