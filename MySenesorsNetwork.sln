@@ -21,9 +21,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LedRGBWController", "..\..\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WhrilessSwitch", "..\..\Arduino\WhrilessSwitch\WhrilessSwitch.vcxproj", "{AFD6CC79-B7D5-4BDA-B7E8-6B14C2E0A572}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemoteRelay", "..\..\..\..\..\Source\Arduino\RemoteRelay\RemoteRelay.vcxproj", "{BF5D3E8D-9100-4DE3-8E2D-E3CB06B3DC6E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemoteRelay", "RemoteRelay\RemoteRelay.vcxproj", "{E01E70B8-15E5-4D52-B0A9-AFE49B2DECB8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemoteRelayBatterySwitch", "..\..\..\..\..\Source\Arduino\RemoteRelayBatterySwitch\RemoteRelayBatterySwitch.vcxproj", "{C62D4409-D5AE-47DE-B058-07096268B263}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemoteRelayBatterySwitch", "RemoteRelayBatterySwitch\RemoteRelayBatterySwitch.vcxproj", "{C62D4409-D5AE-47DE-B058-07096268B263}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,10 +63,10 @@ Global
 		{AFD6CC79-B7D5-4BDA-B7E8-6B14C2E0A572}.Debug|x86.Build.0 = Debug|Win32
 		{AFD6CC79-B7D5-4BDA-B7E8-6B14C2E0A572}.Release|x86.ActiveCfg = Release|Win32
 		{AFD6CC79-B7D5-4BDA-B7E8-6B14C2E0A572}.Release|x86.Build.0 = Release|Win32
-		{BF5D3E8D-9100-4DE3-8E2D-E3CB06B3DC6E}.Debug|x86.ActiveCfg = Debug|Win32
-		{BF5D3E8D-9100-4DE3-8E2D-E3CB06B3DC6E}.Debug|x86.Build.0 = Debug|Win32
-		{BF5D3E8D-9100-4DE3-8E2D-E3CB06B3DC6E}.Release|x86.ActiveCfg = Release|Win32
-		{BF5D3E8D-9100-4DE3-8E2D-E3CB06B3DC6E}.Release|x86.Build.0 = Release|Win32
+		{E01E70B8-15E5-4D52-B0A9-AFE49B2DECB8}.Debug|x86.ActiveCfg = Debug|Win32
+		{E01E70B8-15E5-4D52-B0A9-AFE49B2DECB8}.Debug|x86.Build.0 = Debug|Win32
+		{E01E70B8-15E5-4D52-B0A9-AFE49B2DECB8}.Release|x86.ActiveCfg = Release|Win32
+		{E01E70B8-15E5-4D52-B0A9-AFE49B2DECB8}.Release|x86.Build.0 = Release|Win32
 		{C62D4409-D5AE-47DE-B058-07096268B263}.Debug|x86.ActiveCfg = Debug|Win32
 		{C62D4409-D5AE-47DE-B058-07096268B263}.Debug|x86.Build.0 = Debug|Win32
 		{C62D4409-D5AE-47DE-B058-07096268B263}.Release|x86.ActiveCfg = Release|Win32
