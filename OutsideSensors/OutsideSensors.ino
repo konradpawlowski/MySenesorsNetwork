@@ -21,9 +21,9 @@
 
 // Set RS485 baud rate to use
 #define MY_RS485_BAUD_RATE 9600
-#define DHT_PIN 3
+#define DHT_PIN 5
 #define SENSOR_TEMP_OFFSET 0
-#define LIGHT_SENSOR_ANALOG_PIN A0
+#define LIGHT_SENSOR 3
 
 
 #define CHILD_ID_LIGHT 0
@@ -40,6 +40,7 @@ MyMessage msgHum(CHILD_ID_HUM, V_HUM);
 MyMessage msgTemp(CHILD_ID_TEMP, V_TEMP);
 MyMessage msgBar(CHILD_ID_PRES, V_PRESSURE);
 MyMessage msgTemp2(CHILD_ID_TEMP2, V_TEMP);
+
 
 static const uint8_t FORCE_UPDATE_N_READS = 10;
 
@@ -74,13 +75,13 @@ DhtValue lastDhtValue;
 
 
 
-int lightValue;
+bool lightValue;
 Adafruit_BMP085 bmp;
 DHT dht;
 
-AsyncTask asyncReadLight(100, true, []() { readLight(); });
-AsyncTask asyncReadDht(1000, true, []() { readDht(); });
-AsyncTask asyncReadBmp(1000, true, []() { readBmp(); });
+AsyncTask asyncReadLight(10000, true, []() { readLight(); });
+AsyncTask asyncReadDht(10000, true, []() { readDht(); });
+AsyncTask asyncReadBmp(10000, true, []() { readBmp(); });
 
 
 void presentation()
@@ -89,7 +90,7 @@ void presentation()
 	sendSketchInfo("Outside Sensor", "1.0");
 
 	// Register all sensors to gateway (they will be created as child devices)
-	present(CHILD_ID_LIGHT, S_LIGHT_LEVEL);
+	present(CHILD_ID_LIGHT, S_BINARY);
 	present(CHILD_ID_HUM, S_HUM);
 	present(CHILD_ID_TEMP, S_TEMP);
 	present(CHILD_ID_PRES, S_BARO);
@@ -153,11 +154,18 @@ void readBmp() {
 	}
 
 	// Get humidity from DHT library
-	float presure = bmp.readPressure();
+	//float presure = bmp.readPressure();
+	float presure = bmp.readSealevelPressure(272);
+
 	if (isnan(presure)) {
 		Serial.println("Failed reading humidity from DHT");
 	}
-	else if (presure != lastBmpValue.presure || lastBmpValue.nNoUpdatesHum == FORCE_UPDATE_N_READS) {
+	else {
+		presure = roundf(presure / 100);
+	}
+		
+		
+		if (presure != lastBmpValue.presure || lastBmpValue.nNoUpdatesHum == FORCE_UPDATE_N_READS) {
 		// Only send humidity if it changed since the last measurement or if we didn't send an update for n times
 		lastBmpValue.presure = presure;
 		// Reset no updates counter
@@ -237,7 +245,7 @@ void readDht() {
 
 void readLight() {
 
-	int16_t lightLevel = map(analogRead(LIGHT_SENSOR_ANALOG_PIN), 0, 255, 0, 100);
+	bool lightLevel = digitalRead(LIGHT_SENSOR);
 	Serial.println(lightLevel);
 	if (lightLevel != lastLightLevel) {
 		send(msg.set(lightLevel));
