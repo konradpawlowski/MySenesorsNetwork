@@ -26,13 +26,14 @@
 #define LIGHT_SENSOR 3
 
 
-#define CHILD_ID_LIGHT 0
+#define CHILD_ID_LIGHT 5
 #define CHILD_ID_HUM 1
 #define CHILD_ID_TEMP 2
 #define CHILD_ID_PRES 3
 #define CHILD_ID_TEMP2 4
 
 bool metric = true;
+bool first_message_sent = false;
 
 #include <MySensors.h>
 MyMessage msg(CHILD_ID_LIGHT, V_LIGHT_LEVEL);
@@ -87,36 +88,51 @@ AsyncTask asyncReadBmp(10000, true, []() { readBmp(); });
 void presentation()
 {
 	// Send the sketch version information to the gateway and Controller
-	sendSketchInfo("Outside Sensor", "1.0");
+	sendSketchInfo("Outside Sensor", "2.0");
 
 	// Register all sensors to gateway (they will be created as child devices)
-	present(CHILD_ID_LIGHT, S_BINARY);
-	present(CHILD_ID_HUM, S_HUM);
-	present(CHILD_ID_TEMP, S_TEMP);
-	present(CHILD_ID_PRES, S_BARO);
-	present(CHILD_ID_TEMP2, S_TEMP);
+	present(CHILD_ID_LIGHT, S_BINARY, "Czujnik oœwietlenia");
+	present(CHILD_ID_HUM, S_HUM, "Wilgotnoœæ");
+	present(CHILD_ID_TEMP, S_TEMP, "Temperatura 1");
+	present(CHILD_ID_PRES, S_BARO,"Ciœnienie");
+	present(CHILD_ID_TEMP2, S_TEMP, "Temperatura 2");
 	metric = getControllerConfig().isMetric;
 }
 
-
-
-// the setup function runs once when you press reset or power the board
-void setup() {
+void before() {
 	if (!bmp.begin()) {
 		Serial.println("Could not find a valid BMP085 sensor, check wiring!");
 		while (1) {}
 	}
 	dht.setup(DHT_PIN); // data pin 2
 	sleep(dht.getMinimumSamplingPeriod());
+}
+
+
+// the setup function runs once when you press reset or power the board
+void setup() {
+	
 
 	asyncReadLight.Start();
 	asyncReadDht.Start();
 	asyncReadBmp.Start();
 
+
 }
 
 // the loop function runs over and over again until power down or reset
 void loop() {
+
+	if (first_message_sent == false) {
+		Serial.println("Sending initial state...");
+		readBmp();
+		readDht();
+		readLight();
+
+		first_message_sent = true;
+	}
+
+
 	asyncReadLight.Update();
 	asyncReadBmp.Update();
 	asyncReadDht.Update();
@@ -254,3 +270,4 @@ void readLight() {
 
 
 }
+

@@ -54,6 +54,7 @@
 #define ACK							false
 
 
+
 //#define MY_TRANSPORT_WAIT_READY_MS 5000
 //#include <SPI.h>
 #include <MySensors.h>
@@ -81,10 +82,10 @@ int RELAY_PIN[3] = { 5, 6, 11 }; // Arduino Digital I/O pin number for relay
 int BUTTON_PIN[3] = { 2, 3, 4 };  // Arduino Digital I/O pin number for button 
 
 bool first_message_sent = false;
-unsigned long SLEEP_TIME = 1000; // Sleep time between reads (in milliseconds)
+unsigned long SLEEP_TIME = 15000; // Sleep time between reads (in milliseconds)
 
 
-AsyncTask dsRead (SLEEP_TIME, []() { ReadDs();   }); 
+AsyncTask dsRead (SLEEP_TIME, true, []() { ReadDs();   });
 OneWire oneWire(ONE_WIRE_BUS); // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 DallasTemperature sensors(&oneWire); // Pass the oneWire reference to Dallas Temperature. 
 
@@ -189,7 +190,7 @@ void loop()
 	//	}
 	//}
 
-
+	
 
 	dsRead.Update();
 	for (size_t i = 0; i < 3; i++)
@@ -266,9 +267,10 @@ void SetupDs182b() {
 }
 void ReadDs()
 {
+	Serial.print("Temperature: ");
 	// Fetch temperatures from Dallas sensors
 	sensors.requestTemperatures();
-
+	
 	// query conversion time and sleep until conversion completed
 	int16_t conversionTime = sensors.millisToWaitForConversion(sensors.getResolution());
 	// sleep() call can be replaced by wait() call if node need to process incoming messages (or if node is repeater)
