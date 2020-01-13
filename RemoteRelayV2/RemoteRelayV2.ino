@@ -56,7 +56,7 @@
 #define MS_TEMP_CHILD_ID            3
 #define ACK							false
 
-#define TEMP_SLEEP  30000
+#define TEMP_SLEEP  60000
 #include <MySensors.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
@@ -105,7 +105,7 @@ void before()
 
 	debouncer2.attach(pBTN2);
 	debouncer2.interval(5); // interval in ms
-	ds18b20.begin();
+	//ds18b20.begin();
 
 }
 
@@ -121,12 +121,12 @@ void setup()
 	taskOn = new AsyncTask(5000, []() { setLed(HIGH);   });
 	taskOff = new AsyncTask(1000, []() { setLed(LOW); });
 
-	request(MS_RELAY1_CHILD_ID, V_LIGHT);
-	request(MS_RELAY2_CHILD_ID, V_LIGHT);
+	//request(MS_RELAY1_CHILD_ID, V_LIGHT);
+	//request(MS_RELAY2_CHILD_ID, V_LIGHT);
 	// request(MS_LEDPWM_CHILD_ID, V_DIMMER);
-	asyncReadTemp.Start();
-	ds18b20.setWaitForConversion(false);
-	ds18b20.setResolution(12);
+	//asyncReadTemp.Start();
+	//ds18b20.setWaitForConversion(false);
+	//ds18b20.setResolution(12);
 
 }
 
@@ -142,7 +142,7 @@ void presentation()
 	present(MS_RELAY1_CHILD_ID, S_LIGHT, "Light 1");
 	present(MS_RELAY2_CHILD_ID, S_LIGHT, "Light 2");
 	//present(MS_LEDPWM_CHILD_ID, S_DIMMER, "LED brightness");
-	present(MS_TEMP_CHILD_ID, S_TEMP, "Internal temp");
+	//present(MS_TEMP_CHILD_ID, S_TEMP, "Internal temp");
 }
 
 
@@ -191,7 +191,7 @@ void loop()
 		SetSSR2();
 		value2 = ssrval2;
 	}
-	asyncReadTemp.Update();
+	//asyncReadTemp.Update();
 
 }
 
@@ -201,7 +201,7 @@ void send_startup() {
 
 	send(msgR1.set(digitalRead(pRELAY_1)), ACK);
 	send(msgR1.set(digitalRead(pRELAY_2)), ACK);
-	ReadTemperature();
+	//ReadTemperature();
 }
 
 /**
@@ -222,11 +222,13 @@ void receive(const MyMessage& message)
 		switch (message.sensor)
 		{
 		case MS_RELAY1_CHILD_ID:
-			SetState(pRELAY_1, message.getBool());
+			//SetState(pRELAY_1, message.getBool());
+			SetSSR1();
 			break;
 
 		case MS_RELAY2_CHILD_ID:
-			SetState(pRELAY_2, message.getBool());
+			//SetState(pRELAY_2, message.getBool());
+			SetSSR2();
 			break;
 		default:
 			break;
@@ -238,13 +240,14 @@ void receive(const MyMessage& message)
 
 
 void ReadTemperature() {
+	//Blink(pLED, 1);
 	// Fetch temperatures from Dallas sensors
 	ds18b20.requestTemperatures();
 
 	// query conversion time and sleep until conversion completed
 	int16_t conversionTime = ds18b20.millisToWaitForConversion(ds18b20.getResolution());
 	// sleep() call can be replaced by wait() call if node need to process incoming messages (or if node is repeater)
-	sleep(conversionTime);
+	//wait(conversionTime);
 
 	// Fetch and round temperature to one decimal
 	float temperature = getControllerConfig().isMetric ? ds18b20.getTempC(0) : ds18b20.getTempF(0);
@@ -253,9 +256,10 @@ void ReadTemperature() {
 #if COMPARE_TEMP == 1
 	if (lastTemperature[i] != temperature && temperature != -127.00 && temperature != 85.00) {
 #else
-	if (temperature != -127.00 && temperature != 85.00) {
+	if (temperature != -127.00 && temperature != 85.00) 
+	{
 #endif
-		send(msgT1.setSensor(0).set(temperature, 2));
+		send(msgT1.set(temperature, 2));
 		// Send in the new temperature
 
 		// Save new temperatures for next compare
@@ -301,9 +305,9 @@ void ReadTemperature() {
 		for (size_t i = 0; i < count; i++)
 		{
 			SetState(pin, true);
-			sleep(500);
+			wait(200);
 			SetState(pin, true);
-			sleep(500);
+			wait(200);
 		}
 		
 	}
