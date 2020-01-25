@@ -124,7 +124,7 @@ void UpdateGarageDoorStatus() {
 	value = !door.read();
 
 	if (doorInLast != value) {
-		send(mySmoke.set(value));
+		send(myDoorIn.set(value));
 		doorInLast = value;
 	}
 
@@ -136,7 +136,7 @@ void UpdateSmokeStatus() {
 	value = smoke.read();
 	if (smokeLast != value)
 	{
-		send(myDoorIn.set(value));
+		send(mySmoke.set(value));
 		smokeLast = value;
 	}
 	
