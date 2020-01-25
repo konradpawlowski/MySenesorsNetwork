@@ -6,7 +6,7 @@
 			All non-arduino files created by visual micro and all visual studio project or solution files can be freely deleted and are not required to compile a sketch (do not delete your own code!).
 			Note: debugger breakpoints are stored in '.sln' or '.asln' files, knowledge of last uploaded breakpoints is stored in the upload.vmps.xml file. Both files are required to continue a previous debug session without needing to compile and upload again
 	
-	Hardware: ATmega328P (Old Bootloader) (Arduino Nano), Platform=avr, Package=arduino
+	Hardware: ATmega328P (5V, 16 MHz) (Arduino Pro or Pro Mini), Platform=avr, Package=arduino
 */
 
 #if defined(_VMICRO_INTELLISENSE)
@@ -18,8 +18,8 @@
 #define __AVR_ATmega328p__
 #define _VMDEBUG 1
 #define F_CPU 16000000L
-#define ARDUINO 108010
-#define ARDUINO_AVR_NANO
+#define ARDUINO 10809
+#define ARDUINO_AVR_PRO
 #define ARDUINO_ARCH_AVR
 #define __cplusplus 201103L
 #define _Pragma(x)
@@ -79,7 +79,6 @@ typedef void *__builtin_va_list;
 #define pgm_read_float(address_short) float()
 #define pgm_read_ptr(address_short)   short()
 
-#include "RS485SerialGetway.ino"
-#include "..\RF24SerialGetway\mcp23017_rs485.ino"
+#include "LedRGBWController.ino"
 #endif
 #endif

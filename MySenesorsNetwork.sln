@@ -15,23 +15,25 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OutsideSensors", "OutsideSe
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RoomController1", "RoomController1\RoomController1.vcxproj", "{1B5D1B97-FBB2-4DF4-91B8-4A4E37FD0FCD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemoteSwitch", "..\..\Arduino\RemoteSwitch\RemoteSwitch.vcxproj", "{49084B9A-5876-4FC9-A94B-C40DD57862B7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemoteSwitch", "RemoteSwitch\RemoteSwitch.vcxproj", "{49084B9A-5876-4FC9-A94B-C40DD57862B7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LedRGBWController", "..\..\Arduino\LedRGBWController\LedRGBWController.vcxproj", "{54129BC1-DAD4-4374-9968-B9976C1B0E19}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LedRGBWController", "LedRGBWController\LedRGBWController.vcxproj", "{54129BC1-DAD4-4374-9968-B9976C1B0E19}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WhrilessSwitch", "..\..\Arduino\WhrilessSwitch\WhrilessSwitch.vcxproj", "{AFD6CC79-B7D5-4BDA-B7E8-6B14C2E0A572}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WhrilessSwitch", "WhrilessSwitch\WhrilessSwitch.vcxproj", "{AFD6CC79-B7D5-4BDA-B7E8-6B14C2E0A572}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemoteRelay", "RemoteRelay\RemoteRelay.vcxproj", "{E01E70B8-15E5-4D52-B0A9-AFE49B2DECB8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemoteRelayBatterySwitch", "RemoteRelayBatterySwitch\RemoteRelayBatterySwitch.vcxproj", "{C62D4409-D5AE-47DE-B058-07096268B263}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HeaterController", "..\..\..\..\..\Source\Arduino\HeaterController\HeaterController.vcxproj", "{42EE15AF-67BC-469B-812B-583AF473AC3E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HeaterController", "HeaterController\HeaterController.vcxproj", "{42EE15AF-67BC-469B-812B-583AF473AC3E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RemoteRelay_Asia", "RemoteRelay_Asia", "{5FF88D6B-43FB-462C-8815-885082C91675}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RemoteRelay", "RemoteRelay", "{CB687955-F4F9-407F-BE35-38C390A83F85}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WhrilessSwitch", "RemoteRelayV2\WhrilessSwitch.vcxproj", "{E0E3D777-1FED-46A5-9A13-D86C94B3346F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RemoteRelayV2", "RemoteRelayV2\WhrilessSwitch.vcxproj", "{E0E3D777-1FED-46A5-9A13-D86C94B3346F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GarageController", "GarageController\GarageController.vcxproj", "{A5174B6E-24AE-4969-A301-D8ECE0F025A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{E0E3D777-1FED-46A5-9A13-D86C94B3346F}.Debug|x86.Build.0 = Debug|Win32
 		{E0E3D777-1FED-46A5-9A13-D86C94B3346F}.Release|x86.ActiveCfg = Release|Win32
 		{E0E3D777-1FED-46A5-9A13-D86C94B3346F}.Release|x86.Build.0 = Release|Win32
+		{A5174B6E-24AE-4969-A301-D8ECE0F025A1}.Debug|x86.ActiveCfg = Debug|Win32
+		{A5174B6E-24AE-4969-A301-D8ECE0F025A1}.Debug|x86.Build.0 = Debug|Win32
+		{A5174B6E-24AE-4969-A301-D8ECE0F025A1}.Release|x86.ActiveCfg = Release|Win32
+		{A5174B6E-24AE-4969-A301-D8ECE0F025A1}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
