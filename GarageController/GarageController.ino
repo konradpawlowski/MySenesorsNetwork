@@ -67,10 +67,10 @@ void presentation() {
 	sendSketchInfo("GarageController", "1.0", ACK);
 	
 
-	present(SMOKE_SENSOR, S_SMOKE, "Czujnik dymu");
-	present(GARAGE_IN, S_DOOR, "Brama gara¿owa");
-	present(GARAGE_OUT, S_BINARY, "Brama gara¿owa");
-	present(OUTSIDE_LIGHT, S_BINARY, "Oœwietlnie zewn¹trzne");
+	present(SMOKE_SENSOR, S_SMOKE, "Smoke Sensor");
+	present(GARAGE_IN, S_DOOR, "Garage door sensor");
+	present(GARAGE_OUT, S_BINARY, "Garage door switch");
+	present(OUTSIDE_LIGHT, S_BINARY, "Outsied light");
 
 }
 
@@ -113,6 +113,9 @@ void send_startup() {
 	smokeLast = smoke.read();
 	send(mySmoke.set(smokeLast));
 
+	send(myDoorOut.set(false));
+	send(myLightOutside.set(false));
+
 
 
 }
@@ -121,7 +124,7 @@ void UpdateGarageDoorStatus() {
 	bool value;
 
 	door.update();
-	value = !door.read();
+	value = door.read();
 
 	if (doorInLast != value) {
 		send(myDoorIn.set(value));
