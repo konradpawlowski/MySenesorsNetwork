@@ -50,10 +50,11 @@
 
 
 #define MS_BOARD_NAME               "Oswitelnie garaz"
-#define MS_SOFTWARE_VERSION         "1.0"
+#define MS_SOFTWARE_VERSION         "2.0"
 #define MS_RELAY1_CHILD_ID          1
 #define MS_RELAY2_CHILD_ID          2
-#define MS_TEMP_CHILD_ID            3
+#define MS_RELAY3_CHILD_ID          3
+#define MS_TEMP_CHILD_ID            4
 #define ACK							false
 
 #define TEMP_SLEEP  60000
@@ -65,7 +66,8 @@
 
 MyMessage msgR1(MS_RELAY1_CHILD_ID, V_LIGHT);
 MyMessage msgR2(MS_RELAY2_CHILD_ID, V_LIGHT);
-MyMessage msgT1(MS_TEMP_CHILD_ID, V_TEMP);
+MyMessage msgR3(MS_RELAY3_CHILD_ID, V_LIGHT);
+//MyMessage msgT1(MS_TEMP_CHILD_ID, V_TEMP);
 
 
 Bounce debouncer1 = Bounce();
@@ -73,7 +75,7 @@ Bounce debouncer2 = Bounce();
 
 OneWire oneWire(pDS18B20);
 DallasTemperature ds18b20(&oneWire);
-AsyncTask asyncReadTemp(TEMP_SLEEP, true, []() { ReadTemperature(); });
+//AsyncTask asyncReadTemp(TEMP_SLEEP, true, []() { ReadTemperature(); });
 AsyncTask* taskOn, * taskOff;
 
 bool first_message_sent = false;
@@ -81,6 +83,8 @@ bool ssr1_state = false;
 bool ssr2_state = false;
 bool value1 = true;
 bool value2 = true;
+int lastSval1 = 0;
+int lastSval2 = 0;
 float lastTemperature;
 
 /**
@@ -117,7 +121,7 @@ void before()
 void setup()
 {
 
-
+	
 	taskOn = new AsyncTask(5000, []() { setLed(HIGH);   });
 	taskOff = new AsyncTask(1000, []() { setLed(LOW); });
 
@@ -141,6 +145,7 @@ void presentation()
 
 	present(MS_RELAY1_CHILD_ID, S_LIGHT, "Light 1");
 	present(MS_RELAY2_CHILD_ID, S_LIGHT, "Light 2");
+	present(MS_RELAY3_CHILD_ID, S_LIGHT, "Light All");
 	//present(MS_LEDPWM_CHILD_ID, S_DIMMER, "LED brightness");
 	//present(MS_TEMP_CHILD_ID, S_TEMP, "Internal temp");
 }
@@ -157,6 +162,8 @@ void loop()
 		Serial.println("Sending initial state...");
 		send_startup();
 		first_message_sent = true;
+		lastSval1 = debouncer1.read();
+		lastSval1 = debouncer2.read();
 	}
 
 
@@ -180,16 +187,18 @@ void loop()
 	debouncer2.update();
 
 	int ssrval1 = debouncer1.read();
-	if (value1 != ssrval1)
+	if (lastSval1 != ssrval1)
 	{
+		value1 = !value1;
 		SetSSR1();
-		value1 = ssrval1;
+		lastSval1 = ssrval1;
 	}
 	int ssrval2 = debouncer2.read();
-	if (value2 != ssrval2)
+	if (lastSval2 != ssrval2)
 	{
+		value2 = !value2;
 		SetSSR2();
-		value2 = ssrval2;
+		lastSval2 = ssrval2;
 	}
 	//asyncReadTemp.Update();
 
@@ -200,7 +209,8 @@ void send_startup() {
 	Serial.println("Sending initial state... rgb");
 
 	send(msgR1.set(digitalRead(pRELAY_1)), ACK);
-	send(msgR1.set(digitalRead(pRELAY_2)), ACK);
+	send(msgR2.set(digitalRead(pRELAY_2)), ACK);
+	send(msgR3.set(digitalRead(pRELAY_2)), ACK);
 	//ReadTemperature();
 }
 
@@ -222,13 +232,31 @@ void receive(const MyMessage& message)
 		switch (message.sensor)
 		{
 		case MS_RELAY1_CHILD_ID:
-			//SetState(pRELAY_1, message.getBool());
-			SetSSR1();
+			value1 = message.getBool();
+			SetState(pRELAY_1, value1);
+			send(msgR1.set(value1 ), ACK);
+			//wait(100);
+			send(msgR3.set(value1 || value2), ACK);
 			break;
 
 		case MS_RELAY2_CHILD_ID:
-			//SetState(pRELAY_2, message.getBool());
-			SetSSR2();
+			value2 = message.getBool();
+			SetState(pRELAY_2, value2);
+
+			//wait(100);
+			send(msgR2.set(value2), ACK);
+			send(msgR3.set(value1 || value2), ACK);
+			break;
+		case MS_RELAY3_CHILD_ID:
+			value1 = message.getBool();
+			value2 = message.getBool();
+			SetState(pRELAY_1, value1);
+			send(msgR1.set(value1), ACK);
+			//wait(100);
+			SetState(pRELAY_2, value2);
+			send(msgR2.set(value2), ACK);
+			//wait(100);
+			send(msgR2.set(value1 || value2), ACK);
 			break;
 		default:
 			break;
@@ -239,33 +267,33 @@ void receive(const MyMessage& message)
 }
 
 
-void ReadTemperature() {
-	//Blink(pLED, 1);
-	// Fetch temperatures from Dallas sensors
-	ds18b20.requestTemperatures();
-
-	// query conversion time and sleep until conversion completed
-	int16_t conversionTime = ds18b20.millisToWaitForConversion(ds18b20.getResolution());
-	// sleep() call can be replaced by wait() call if node need to process incoming messages (or if node is repeater)
-	//wait(conversionTime);
-
-	// Fetch and round temperature to one decimal
-	float temperature = getControllerConfig().isMetric ? ds18b20.getTempC(0) : ds18b20.getTempF(0);
-
-	// Only send data if temperature has changed and no error
-#if COMPARE_TEMP == 1
-	if (lastTemperature[i] != temperature && temperature != -127.00 && temperature != 85.00) {
-#else
-	if (temperature != -127.00 && temperature != 85.00) 
-	{
-#endif
-		send(msgT1.set(temperature, 2));
-		// Send in the new temperature
-
-		// Save new temperatures for next compare
-		lastTemperature = temperature;
-	}
-}
+//void ReadTemperature() {
+//	//Blink(pLED, 1);
+//	// Fetch temperatures from Dallas sensors
+//	ds18b20.requestTemperatures();
+//
+//	// query conversion time and sleep until conversion completed
+//	int16_t conversionTime = ds18b20.millisToWaitForConversion(ds18b20.getResolution());
+//	// sleep() call can be replaced by wait() call if node need to process incoming messages (or if node is repeater)
+//	//wait(conversionTime);
+//
+//	// Fetch and round temperature to one decimal
+//	float temperature = getControllerConfig().isMetric ? ds18b20.getTempC(0) : ds18b20.getTempF(0);
+//
+//	// Only send data if temperature has changed and no error
+//#if COMPARE_TEMP == 1
+//	if (lastTemperature[i] != temperature && temperature != -127.00 && temperature != 85.00) {
+//#else
+//	if (temperature != -127.00 && temperature != 85.00) 
+//	{
+//#endif
+//		send(msgT1.set(temperature, 2));
+//		// Send in the new temperature
+//
+//		// Save new temperatures for next compare
+//		lastTemperature = temperature;
+//	}
+//}
 	
 
 
@@ -279,18 +307,20 @@ void ReadTemperature() {
 	}
 	void SetSSR1() {
 
-		ssr1_state = !ssr1_state;
-		SetState(pRELAY_1, ssr1_state);
-		send(msgR1.set(ssr1_state), ACK);
+		
+		SetState(pRELAY_1, value1);
+		send(msgR1.set(value1), ACK);
+		send(msgR3.set(value1 || value2), ACK);
 		//Blink(pLED, 1);
 
 	}
 
 	void SetSSR2() {
 
-		ssr2_state = !ssr2_state;
-		SetState(pRELAY_2, ssr2_state);
-		send(msgR2.set(ssr2_state), ACK);
+		
+		SetState(pRELAY_2, value2);
+		send(msgR2.set(value2), ACK);
+		send(msgR3.set(value1 || value2), ACK);
 		//Blink(pLED, 2);
 
 
@@ -301,13 +331,13 @@ void ReadTemperature() {
 	}
 
 
-	void Blink(uint8_t pin, int count) {
-		for (size_t i = 0; i < count; i++)
-		{
-			SetState(pin, true);
-			wait(200);
-			SetState(pin, true);
-			wait(200);
-		}
-		
-	}
+	//void Blink(uint8_t pin, int count) {
+	//	for (size_t i = 0; i < count; i++)
+	//	{
+	//		SetState(pin, true);
+	//		wait(200);
+	//		SetState(pin, true);
+	//		wait(200);
+	//	}
+	//	
+	//}
